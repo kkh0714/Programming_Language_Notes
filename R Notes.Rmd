@@ -10,21 +10,23 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Basic Setup
 
-Review STAT6180 first lecture for R & RStudio setup and assignment for LateX (pdf) setup
+- Review STAT6180 first lecture for R & RStudio setup and assignment for LateX (pdf) setup
 
-R Markdown Official Documentation: https://rmarkdown.rstudio.com/lesson-1.html?_gl=1*1rvamfj*_up*MQ..*_ga*MTQzNDI2NTk5My4xNzY5ODM3MTI3*_ga_X64JZVV9NC*czE3Njk4MzcxMjYkbzEkZzAkdDE3Njk4MzcxMjYkajYwJGwwJGgw
+- R Markdown Official Documentation: https://rmarkdown.rstudio.com/lesson-1.html?_gl=1*1rvamfj*_up*MQ..*_ga*MTQzNDI2NTk5My4xNzY5ODM3MTI3*_ga_X64JZVV9NC*czE3Njk4MzcxMjYkbzEkZzAkdDE3Njk4MzcxMjYkajYwJGwwJGgw
 
-# Useful Comman
-```{r}
-update.packages() #without arguments will check every package you have installed 
-```
-
-```{r}
-install.packages('tinytex')
-```
-```{r}
-tinytex::install_tinytex()
-```
+# Useful Command
+### Update Packages
+- `update.packages()` without arguments will check every package you have installed 
+- Setting file position: Go to the top menu: Session > Set Working Directory > To Source File Location.
+- Input `<-` = `Alt + -`(Windows) `Option + -`(MacOS)
+- Auto-indentation: `Ctrl + I`(Windows) `Control + I`(MacOS)
+- `install.packages('')`
+- Run all R chunks above: `Ctrl + Alt + P`(Windows) `CMD + Option + P`(MacOS) 
+- Run all R chunks in document: `Ctrl + Alt + R`(Windows) `CMD + Option + R`(MacOS) 
+- Insert R chunk in RMD: `Ctrl + Alt + I`(Windows) `CMD + Option + I`(MacOS) 
+- Run current R chunk: `Ctrl + Shift + Enter`(Windows) `CMD + Shift + Return`(MacOS) 
+- Input `%>%` = `Ctrl + Shift + M`(Windows) `CMD + Shift + M`(MacOS)
+- Comment the code: `Ctrl + Shift + C`(Windows) `CMD + Shift + C`(MacOS)
 
 
 
