@@ -1,0 +1,31 @@
+---
+title: "R Notes"
+output: pdf_document
+date: "2026-01-30"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Basic Setup
+
+Review STAT6180 first lecture for R & RStudio setup and assignment for LateX (pdf) setup
+
+R Markdown Official Documentation: https://rmarkdown.rstudio.com/lesson-1.html?_gl=1*1rvamfj*_up*MQ..*_ga*MTQzNDI2NTk5My4xNzY5ODM3MTI3*_ga_X64JZVV9NC*czE3Njk4MzcxMjYkbzEkZzAkdDE3Njk4MzcxMjYkajYwJGwwJGgw
+
+# Useful Comman
+```{r}
+update.packages() #without arguments will check every package you have installed 
+```
+
+```{r}
+install.packages('tinytex')
+```
+```{r}
+tinytex::install_tinytex()
+```
+
+
+
+
