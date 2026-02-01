@@ -14,8 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 - R Markdown Official Documentation: https://rmarkdown.rstudio.com/lesson-1.html?_gl=1*1rvamfj*_up*MQ..*_ga*MTQzNDI2NTk5My4xNzY5ODM3MTI3*_ga_X64JZVV9NC*czE3Njk4MzcxMjYkbzEkZzAkdDE3Njk4MzcxMjYkajYwJGwwJGgw
 
-# Useful Command
-### Update Packages
+# Useful Commands
 - `update.packages()` without arguments will check every package you have installed 
 - Setting file position: Go to the top menu: Session > Set Working Directory > To Source File Location.
 - Input `<-` = `Alt + -`(Windows) `Option + -`(MacOS)
@@ -24,9 +23,24 @@ knitr::opts_chunk$set(echo = TRUE)
 - Run all R chunks above: `Ctrl + Alt + P`(Windows) `CMD + Option + P`(MacOS) 
 - Run all R chunks in document: `Ctrl + Alt + R`(Windows) `CMD + Option + R`(MacOS) 
 - Insert R chunk in RMD: `Ctrl + Alt + I`(Windows) `CMD + Option + I`(MacOS) 
-- Run current R chunk: `Ctrl + Shift + Enter`(Windows) `CMD + Shift + Return`(MacOS) 
+- Run current R chunk: `Ctrl + Enter`(Windows) `CMD + Return`(MacOS) 
 - Input `%>%` = `Ctrl + Shift + M`(Windows) `CMD + Shift + M`(MacOS)
 - Comment the code: `Ctrl + Shift + C`(Windows) `CMD + Shift + C`(MacOS)
+
+# Statistic Commands
+- `pnorm(Z-value, lower.tail = F)`
+- `pt(t-value, df, lower.tail = F)` | `qt(percentile(i.e. 0.975), df, lower.tail = F)` 
+- `head(data)` | `tail(data)`
+
+# Statistical Knowledge
+### Core techniques
+- Z-test
+- one-sample t-test
+- two-sample t-test
+- paired t-test
+
+- **Response variable** (**Dependent Variable**) is the outcome you are interested in measuring or predicting.
+- **Predictor variable** (**Independent Variable**) is the factor you believe affects the outcome or to make a prediction
 
 
 
