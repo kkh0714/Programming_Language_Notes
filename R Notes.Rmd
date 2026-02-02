@@ -7,6 +7,10 @@ date: "2026-01-30"
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+```{r}
+suppressMessages(library(tidyverse))
+suppressMessages(library(dplyr))
+```
 
 # Basic Setup
 
@@ -27,21 +31,124 @@ knitr::opts_chunk$set(echo = TRUE)
 - Input `%>%` = `Ctrl + Shift + M`(Windows) `CMD + Shift + M`(MacOS)
 - Comment the code: `Ctrl + Shift + C`(Windows) `CMD + Shift + C`(MacOS)
 
-# Statistic Commands
+# Statistic Code
 - `pnorm(Z-value, lower.tail = F)`
 - `pt(t-value, df, lower.tail = F)` | `qt(percentile(i.e. 0.975), df, lower.tail = F)` 
 - `head(data)` | `tail(data)`
+- `subset(data, subset, select) #dplyr filter has the same function` 
+  - data: The data object of interest
+  - subset: Condition on which to keep observations
+  - select: Condition on which columns to keep
+```{r}
+#Example 1: top2 = subset(top3, Country != "Canada") # Ignore Canada
+#Example 2: 
+# wantedCols = c("Q01_gender", "Q02_hair.cost")
+# mydata = subset(rawdata, Q01_gender == 1 & Q02_hair.cost > 20, select = wantedCols)
+# head(genderTVhairdat)
+
+#Example 2(dplyr):
+# rawdata %>% 
+#   filter(Q01_gender == 1 & Q02_hair.cost > 20) %>%
+#   select(Q01_gender, Q02_hair.cost)
+
+#   Q01_gender Q02_hair.cost
+# 1          1            30    
+# 2          1            35      
+# 3          1            26      
+# 4          1            25      
+``` 
+- `boxplot(Y ~ X1 + X2 + ..., data=data)`
+- `table()` to check data balance
+- `hist(data$variable)`
+
+--- dplyr getting mean of the samples
+  - `plot(data, panel = panel.smooth) #shows scatterplot with a line in each graph`
+  - 
+
+
+Replace value:
+```{r}
+# 1. mutate(gender_num = ifelse(gender == "male"), 1, 0)
+# 2. mutate(gender_num = factor(
+#     case_when(
+#       gender == "male" ~ 1,
+#       gender == "female" ~ 0
+#       )
+#     )
+#    )
+```
 
 # Statistical Knowledge
 ### Core techniques
 - Z-test
-- one-sample t-test
-- two-sample t-test
-- paired t-test
+- one sample t-test
+- two sample t-test 
+  - When the sd are very different for the two batch of samples, we need a separate test as it violates the two sample t-test assumption (STAT6180 Week2 P.36). The rule of thumb is the ratio of the sd should be less than 2 (STAT6180 Week2 P.65). Otherwise, use Welch-Satterthwaite modification (STAT6180 Week2 P.40).
+  - Use F-distribution for checking equal variances
+- paired t-test 
+  - One of the main features of paired t-test is that the number of the observations have to be the same for both sample, such that they can be paired --STAT6180 Week2 P.34
+- Confidence intervals = estimate +- critical value * estimated s.e.(estimate)
+
+- ANOVA (Analysis of Variance) 
+  - `anova()`
+  
+- Two-way ANOVA (STAT6180 Week10)
+  - Interaction between factors `lm(Y ~ X_A + X_B + X_A:X_B, data=data)` or `aov(Y ~ X_A*X_B, data=data)`
+  - Balanced data:
+    1. Order of the factor does **NOT** matter
+  - Unbalanced data:
+    1. Order of the factor **DOES** matter
+  - Method:
+    1. Fit a model with an interaction term. If significant, then stop
+    2. Fit the model with only main effects `lm(Y ~ X_A + X_B, data=data`
+
+- Transformation (STAT6180 Week5)
+  - Reasons to apply transformation:
+    1. Data does not always follow the requirements of the statistical inference techniques
+    2. We need a way of adapting the non-valid data into data that is valid to be analysed
+  - `log2()` | `log10()` | `sqrt()`
+  - `log(sth + 0.01)` in case there is zero value
+  - However, it makes the interpretation of the result difficult. Only use it if we can detect a significant effect with a nonparametric test, we can be confident in that effect.
+  
+- Linear regression (STAT6180 Week7)
+  - `lm(Y ~ X, data=data)`
+  - Assumptions:
+    1. Residuals on Normal Q-Q plot should be linear
+    2. No pattern in residuals vs fitted plot
+```{r}
+# par(mfrow = c(1, 2))
+# 1. qqnorm(data$residuals)
+# 2. plot(data$fitted, data$residuals, main = "Residuals vs Fitted",xlab = "Fitted values", ylab = "Residuals")
+```
+  - Positive(1), Negative(-1), or no(0) linear relationship
+
+- Multiple regression (STAT6180 Week8)
+  - `lm(Y ~ X1 + X2 + X3 +..., data=data)`
+  - Assumptions:
+    1. Residuals on Normal Q-Q plot should be linear
+    2. No pattern in residuals vs fitted plot
+    3. No pattern in residuals vs $X_i$ plot
+```{r}
+# 3. plot(data$X1, data$residuals)
+#    plot(data$X2, data$residuals)
+#    plot(data$X3, data$residuals)
+```
+  - **Adjusted** $R^2$ is used to penalise the number of parameters to offset the increase in $R^2$
+- Multi-collinearity (STAT6180 Week8 P.43)
+  - When multi-collinearity exists, remove predictor with the largest p-value first. Then, regress with the reduced model until all the predictor p-values are significant
+  
+- Polynomial Regression (STAT6180 Week9)
+  - `lm(Y ~ X + I(X^2) + I(X^3), data=data`
+  - drop with the highest order as always. Drop when it is not significant
+  
+Interpretation of the results:
+- multi-linear interpretation (STAT6180 Week8 P.72)
+- multi-linear interpretation (STAT6180 Week9 P.35)
 
 - **Response variable** (**Dependent Variable**) is the outcome you are interested in measuring or predicting.
 - **Predictor variable** (**Independent Variable**) is the factor you believe affects the outcome or to make a prediction
 
-
+Boxplot:
+- Useful when we compare the values of multiple categorical variable with different levels
 
 
