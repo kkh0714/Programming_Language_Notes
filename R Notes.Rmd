@@ -60,16 +60,20 @@ suppressMessages(library(dplyr))
 - `par(mfrow = c(1, 2))` | `plot(data, which = 1:2)`
 - `boxplot(Y ~ X1 + X2 + ..., data=data)`
 - `table()` to check data balance
+- `xtabs(~X1 + X2, data=data)` for binary regression
 - `hist(data$variable)` | `ggplot(data, aes(x=#the predictor#))+geom_histogram()+theme_bw()`
 - `levels(drink$sex)` check the current reference level 
-- `drink$sex = relevel(drink$sex, "M")` change the reference level
+- `data$variable <- as_factor(data$variable)` need to do this before relevel `(as.factor = as_factor)`
+  - `drink$sex = relevel(drink$sex, "M")` change the reference level to "M"
+  - `drink$sex = relevel(drink$sex, ref=2)` change the reference level to "M"
+```{r}
+
+```
 
 --- dplyr getting mean of the samples
 
   - `plot(data, panel = panel.smooth)` shows scatter plot with a line in each graph
   - `library(GGally)` `ggpairs(data, lower=list(continuous="smooth_loess")` shows scatter plot with correlation value in once
-
-
 
 Replace value:
 ```{r}
@@ -83,96 +87,187 @@ Replace value:
 #    )
 ```
 
+### DPLYR coding
+```{r}
+# rawdata %>% 
+#   filter(Q01_gender == 1 & Q02_hair.cost > 20) %>%
+#   select(Q01_gender, Q02_hair.cost)
+
+#   Q01_gender Q02_hair.cost
+# 1          1            30    
+# 2          1            35      
+# 3          1            26      
+# 4          1            25      
+
+# ===========================================================
+# Change reference level
+
+# data <- data %>% 
+#   mutate(variable = fct_relevel(variable, ref=...))
+# ===========================================================
+# Replace or cutting value
+
+# 1. mutate(gender_num = ifelse(gender == "male"), 1, 0)
+# 2. mutate(bmi_cat3 = factor(
+#     case_when(
+#       bmi <= 18.5 ~ "Underweight",
+#       bmi <= 25 ~ "Normal",
+#       bmi <= 30 ~ "Overweight",
+#       .default = "Obese"
+#     )
+#    ))
+```
+```
+
+
 # Statistical Knowledge
 ### General note
 - We should be very careful about excluding observations in real studies. When this is done it needs to be reported; this is important for scientific integrity.
 - Assumptions:
   1. Normality assumption / the normal distribution of the $\epsilon_i$
   2. Homogeneity of Variance assumption / the homogeneous variance of the $\epsilon_i$
+- $\epsilon$ is an error term. It is unobservable, but can be estimated as the difference between fitted values and residuals (STAT8111 Week1)
 
 ### Core techniques
-- Z-test
-- one sample t-test
-- two sample t-test 
-  - When the sd are very different for the two batch of samples, we need a separate test as it violates the two sample t-test assumption (STAT6180 Week2 P.36). The rule of thumb is the ratio of the sd should be less than 2 (STAT6180 Week2 P.65). Otherwise, use Welch-Satterthwaite modification (STAT6180 Week2 P.40).
-  - Use F-distribution for checking equal variances
-- paired t-test 
-  - One of the main features of paired t-test is that the number of the observations have to be the same for both sample, such that they can be paired --STAT6180 Week2 P.34
-- Confidence intervals = estimate +- critical value * estimated s.e.(estimate)
 
+#### Z-test
+
+#### One sample t-test 
+- `t.test(data$variable, mu=..., alternative = "greater")`
+
+#### Two sample t-test 
+- `t.test(Y~X, var.equal=TRUE, data=data)`
+- When the sd are very different for the two batch of samples, we need a separate test as it violates the two sample t-test assumption (STAT6180 Week2 P.36). The rule of thumb is the ratio of the sd should be less than 2 (STAT6180 Week2 P.65). Otherwise, use Welch-Satterthwaite modification (STAT6180 Week2 P.40).
+- Use F-distribution for checking equal variances
+
+#### Paired t-test 
+- `t.test(X1, X2, paired=TRUE, data=data)`
+- One of the main features of paired t-test is that the number of the observations have to be the same for both sample, such that they can be paired --STAT6180 Week2 P.34
+
+- Confidence intervals = estimate +- critical value * estimated s.e.(estimate)
 - ANOVA (Analysis of Variance) 
   - `anova()`
   
-- Two-way ANOVA (STAT6180 Week10)
-  - Interaction between factors `lm(Y ~ X_A + X_B + X_A:X_B, data=data)` or `aov(Y ~ X_A*X_B, data=data)`
-  - Balanced or Proportionally Balanced data:
-    1. Order of the factor does **NOT** matter
-  - Unbalanced data:
-    1. Order of the factor **DOES** matter
-  - Method:
-    1. Fit a model with an interaction term. If significant, then stop
-    2. Fit the model with only main effects `lm(Y ~ X_A + X_B, data=data`
+#### Two-way ANOVA (STAT6180 Week10)
+- Interaction between factors `lm(Y ~ X_A + X_B + X_A:X_B, data=data)` or `aov(Y ~ X_A*X_B, data=data)` (STAT6175 Week7 P.21)
+- Balanced or Proportionally Balanced data:
+  1. Order of the factor does **NOT** matter
+- Unbalanced data:
+  1. Order of the factor **DOES** matter
+- Method:
+  1. Fit a model with an interaction term. If significant, then stop
+  2. Fit the model with only main effects `lm(Y ~ X_A + X_B, data=data`
 
-- Transformation (STAT6180 Week5)
-  - Transformation can apply to response or predictor variables
-  - Reasons to apply transformation:
-    1. Data does not always follow the requirements of the statistical inference techniques
-    2. We need a way of adapting the non-valid data into data that is valid to be analysed
-  - `log2()` | `log10()` | `sqrt()`
-  - `log(sth + 0.01)` in case there is zero value
-  - However, it makes the interpretation of the result difficult. Only use it if we can detect a significant effect with a nonparametric test, we can be confident in that effect.
+#### Transformation (STAT6180 Week5)
+- Transformation can apply to response or predictor variables
+- Reasons to apply transformation:
+  1. Data does not always follow the requirements of the statistical model assumptions 
+  2. We need a way of adapting the non-valid data into data that is valid to be analysed
+- `log2()` | `log10()` | `sqrt()`
+- `log(sth + 0.01)` in case there is zero value
+- However, it makes the interpretation of the result difficult. Only use it if we can detect a significant effect with a nonparametric test, we can be confident in that effect.
   
-- Linear regression (STAT6180 Week7)
-  - `lm(Y ~ X, data=data)`
-  - Assumptions:
-    1. Residuals on Normal Q-Q plot should be linear
-    2. No pattern in residuals vs fitted plot
+#### Linear regression (STAT6180 Week7)
+- `lm(Y ~ X, data=data)`
+- Assumptions:
+  1. Residuals on Normal Q-Q plot should be linear
+  2. No pattern in residuals vs fitted plot
 ```{r}
 # par(mfrow = c(1, 2))
 # 1. qqnorm(data$residuals)
 # 2. plot(data$fitted, data$residuals, main = "Residuals vs Fitted",xlab = "Fitted values", ylab = "Residuals")
 ```
-  - Positive(1), Negative(-1), or no(0) linear relationship
+- Positive(1), Negative(-1), or no(0) linear relationship
 
-- Multiple regression (STAT6180 Week8)
-  - `lm(Y ~ X1 + X2 + X3 +..., data=data)`
-  - Assumptions:
-    1. Residuals on Normal Q-Q plot should be linear
-    2. No pattern in residuals vs fitted plot
-    3. No pattern in residuals vs $X_i$ plot
+#### Multiple regression (STAT6180 Week8)
+- `lm(Y ~ X1 + X2 + X3 +..., data=data)`
+- Assumptions:
+  1. Residuals on Normal Q-Q plot should be linear
+  2. No pattern in residuals vs fitted plot
+  3. No pattern in residuals vs $X_i$ plot
 ```{r}
 # 3. plot(data$X1, data$residuals)
 #    plot(data$X2, data$residuals)
 #    plot(data$X3, data$residuals)
 ```
-  - **Adjusted** $R^2$ is used to penalise the number of parameters to offset the increase in $R^2$
-- Multi-collinearity (STAT6180 Week8 P.43)
-  - When multi-collinearity exists, remove predictor with the largest p-value first. Then, regress with the reduced model until all the predictor p-values are significant
-  - Rule of thumb: correlation > 0.7 is considered "high"
-  - `vif(m1)` rule of thumb: VIF > 10 indicates collinearity (STAT6175 Week4 P.42)
+- **Adjusted** $R^2$ is used to penalise the number of parameters to offset the increase in $R^2$
+
+#### Multi-collinearity (STAT6180 Week8 P.43)
+- When multi-collinearity exists, remove predictor with the largest p-value first. Then, regress with the reduced model until all the predictor p-values are significant
+- Rule of thumb: correlation > 0.7 is considered "high"
+- `vif(m1)` rule of thumb: VIF > 10 indicates collinearity (STAT6175 Week4 P.42)
   
-- Polynomial Regression (STAT6180 Week9)
-  - `lm(Y ~ X + I(X^2) + I(X^3), data=data`
-  - drop with the highest order as always. Drop when it is not significant
+#### Polynomial Regression (STAT6180 Week9)
+- `lm(Y ~ X + I(X^2) + I(X^3), data=data`
+- drop with the highest order as always. Drop when it is not significant
   
-- Detect Outlier (STAT6175 Week3, STAT8111 Week1)
-  - `library(brrom)` | `tidy()`, `augment()`, `glance()` 
-  - **influential point** is one which influences the regression parameters
-  - High leverage has the ability to be influential. Rule of Thumb: 0.2-0.5 = moderate, >0.5 = high
-    - `leverage <- hatvalues(lm(Y~X, data=data))`
-    - `max(leverage)`
-  - DFBETA `dfbetas(m1)`
-  - Cook's Distance `cooks.distance(m1)`
-    - $C_i > 1$ is considered to be "large"
+#### Detect Outlier (STAT6175 Week3, STAT8111 Week1)
+- `library(brrom)` | `tidy()`, `augment()`, `glance()` 
+- **influential point** is one which influences the regression parameters
+- High leverage has the ability to be influential. Rule of Thumb: 0.2-0.5 = moderate, >0.5 = high
+  - `leverage <- hatvalues(lm(Y~X, data=data))`
+  - `max(leverage)`
+  - cutoff = 2p/n for large values (STAT8111 Week1)
+- DFBETA `dfbetas(m1)`
+- Cook's Distance `cooks.distance(m1)`
+  - $C_i > 1$ is considered to be "large"
+    
+#### Categorical variable (STAT6175 Week5)
+- reference category `relevel(data$variable, exact value)`
+  - it cannot be sparse
+  - convenient to choose the "normal" or "usual" level (the level having the most cases)
+- Preferably not to categories a continuous covariate as it causes loss of information
   
-Interpretation of the results:
-- multi-linear interpretation (STAT6180 Week8 P.72)
-- multi-linear interpretation (STAT6180 Week9 P.35)
-- multi-linear interpretation (STAT6175 Week3 P.32)
+#### Confounding (STAT6175 Week7)
+- a confounder is a variable in a study that may not be of direct interest, but has an association with both response and predictors
+- confounders must be taken into account or controlled for. Otherwise, it is wrong. For example, excluding confounder leads to the intercept change from positive to negative. You need to include it
+  
+#### AIC/BIC (STAT6175 Week8)
+- must always use the same set of observations for comparing models where there is no missing values for all of the predictors
+- BIC is more conservative than AIC with less terms
+- small AIC/BIC is good
+  
+#### Generalised Linear Model 
+- Exponential Family: Bernoulli | Poisson | Gamma | Inverse Gaussian (STAT6175 Week9)
+- we assume Bernoulli / poisson / gamma ... distribution of the response variable $Y_i$ instead of normal distribution of the $\epsilon$
+- **Logistic Regression** (STAT6175 Week9)
+  - what is the probability of success or failure?
+  - `glm(Y ~ X1 + X2..., family = "binomial", data=data)`
+  - Diagnostics: Always check `Residual deviance/its df` to see if there is overdispersion or not. Rule of thumb: not too much greater than 1
+  - Sensitivity: `Predicted Yes/Total Yes` | Specificity: `Predicted No/Total No`
+  - ROC curves `library(pROC)` | In practice, we want AUC >= 0.7 
+- **Poisson Distribution** (STAT6175 Week9)
+  - what is the expected count (rate)?
+  - `glm(Y ~ X1 + X2..., family = poisson(link="log"/"sqrt"/...), data=data)`. Better use log but not other link function as log is easier to interpret the result
+  - if the response variable(Y) is a rate i.e. death rate, we need to have **offset** term
+  - Diagnostics: Always check `Residual deviance/its df` to see if there is overdispersion or not. Rule of thumb: 1 to 1.5 is fine, 2 not ok, > 2 is bad. When overdispersion occurs, we use Negative Binomial (NB) distribution
+- **Negative Binomial Distribution** (STAT6175 Week11)
+  - `glm.nb(Y ~ X1 + X2..., link="log", data=data)`
+- **Gamma Distribution** (STAT6175 Week12)
+  - it is a (1) continuous, (2) positive, (3) right-skewed distribution
+  - `glm(Y~ X1 + X2..., family = Gamma(link="log"), data=data)`
+  - Dispersion = residual deviance / Dispersion parameter, should be around 1.
+  - `library(DHARMa)`
+
+  
+### Interpretation of the results:
+- multi-linear interpretation (STAT6180 Week8 P.72) | (STAT6180 Week9 P.35) | (STAT6175 Week3 P.32) | (STAT8111 Week1 P.15)
+- categorical variables interpretation (STAT6175 Week5 P.30-31) | (STAT6175 Week5 P.58)
+- interaction interpretation (STAT6175 Week7 P.35-36, P.52) 
+- log interpretation (STAT6175 Week8 P.43, P.49, P.51)
+- poisson interpretation (STAT6175 Week10 P.39)
+- gamma interpretation (STAT6175 Week12 P.32)
 
 - **Response variable** (**Dependent Variable**) is the outcome you are interested in measuring or predicting.
 - **Predictor variable** (**Independent Variable**) is the factor you believe affects the outcome or to make a prediction
 
-Boxplot:
-- Useful when we compare the values of multiple categorical variable with different levels
+### Graph
+- Continuous variable: look at histogram, scatterplot matrix
+- Categorical variable: look at frequency table, cross-tab
+- Categorical-by-numeric/continuous variable: boxplot
+- Categorical-by-categorical variable: tables
 
+### something that you should not do in practice
+- combining variables together as it causes imprecise parameter estimates, i.e. have large standard errors (STAT6175 Week8 P.28)
+- put them in an "Other" group in worst case where it has no information
+- Differences in AIC or BIC of less than one are not considered important. Obtain expert knowledge from the client if there is one
